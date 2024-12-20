@@ -57,7 +57,7 @@ def print_header():
 
     print(border)
     print(colored_art)
-    print(colored("by Enukio", color="cyan", attrs=["bold"]))
+    print(colored("by dark life", color="cyan", attrs=["bold"]))
     print("\nWelcome to NodepayBot - Automate your tasks effortlessly!")
 
 def print_file_info():
