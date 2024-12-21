@@ -13,7 +13,6 @@ from loguru import logger
 from pyfiglet import figlet_format
 from termcolor import colored
 
-
 # Global configuration
 SHOW_REQUEST_ERROR_LOG = False
 
@@ -49,7 +48,6 @@ logger.add(
 )
 logger = logger.opt(colors=True)
 
-
 def print_header():
     ascii_art = figlet_format("NodepayBot", font="slant")
     colored_art = colored(ascii_art, color="cyan")
@@ -59,7 +57,6 @@ def print_header():
     print(colored_art)
     print(colored("by dark life", color="cyan", attrs=["bold"]))
     print("\nWelcome to NodepayBot - Automate your tasks effortlessly!")
-
 
 def print_file_info():
     tokens = load_file('tokens.txt')
@@ -72,7 +69,6 @@ def print_file_info():
         "\nNodepay only supports 3 connections per account. Using too many proxies may cause issues.\n"
         f"\n{border}"
     )
-
 
 def ask_user_for_proxy():
     while (user_input := input("Do you want to use proxy? (yes/no)? ").strip().lower()) not in ['yes', 'no']:
@@ -89,7 +85,6 @@ def ask_user_for_proxy():
     else:
         return []
 
-
 def load_file(filename, split_lines=True):
     try:
         with open(filename, 'r') as file:
@@ -99,10 +94,8 @@ def load_file(filename, split_lines=True):
         logger.error(f"<red>File '{filename}' not found. Please ensure it exists.</red>")
         return []
 
-
 def load_proxies():
     return load_file('proxies.txt')
-
 
 def assign_proxies_to_tokens(tokens, proxies):
     if proxies is None:
@@ -111,13 +104,11 @@ def assign_proxies_to_tokens(tokens, proxies):
     remaining = [(token, None) for token in tokens[len(proxies):]]
     return paired + remaining
 
-
 def extract_proxy_ip(proxy_url):
     try:
         return urlparse(proxy_url).hostname
     except Exception:
         return "Unknown"
-
 
 def get_ip_address(proxy=None):
     try:
@@ -127,7 +118,6 @@ def get_ip_address(proxy=None):
     except Exception as e:
         logger.error(f"<red>Failed to fetch IP address: {e}</red>")
     return "Unknown"
-
 
 def log_user_data(users_data):
     if not users_data:
@@ -145,7 +135,6 @@ def log_user_data(users_data):
     except Exception as e:
         if SHOW_REQUEST_ERROR_LOG:
             logger.error(f"Logging error: {e}")
-
 
 def dailyclaim(token):
     tokens = load_file("tokens.txt")
@@ -186,7 +175,6 @@ def dailyclaim(token):
     except Exception as e:
         logger.error(f"Request failed: {e}") if SHOW_REQUEST_ERROR_LOG else None
         return False
-
 
 async def call_api(url, data, token, proxy=None, timeout=60):
     headers = {
@@ -230,7 +218,6 @@ async def call_api(url, data, token, proxy=None, timeout=60):
 
     return None
 
-
 async def get_account_info(token, proxy=None):
     url = DOMAIN_API["SESSION"]
     try:
@@ -246,9 +233,8 @@ async def get_account_info(token, proxy=None):
         logger.error(f"<red>Error fetching account info for token {token[-10:]}: {e}</red>")
     return None
 
-
 async def start_ping(token, account_info):
-    url = DOMAIN_API["PING"]
+    url = DOMAIN_API["PING"][0]  # Use the first URL in the list
     headers = {
         "Authorization": f"Bearer {token}",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
@@ -268,24 +254,51 @@ async def start_ping(token, account_info):
 
         await asyncio.sleep(PING_INTERVAL)
 
+async def process_account(token, use_proxy, proxies=None, ping_interval=2.0):
+    proxies = proxies or []
+    proxy_list = proxies if use_proxy else [None]
+
+    proxy = proxy_list[0] if proxy_list else None
+    browser_id = str(uuid.uuid4())
+
+    account_info = None
+    if not account_info:
+        account_info = await get_account_info(token, proxy)
+
+    if not account_info:
+        logger.error(f"<red>Account info not found for token {token}</red>")
+        return
+
+    logger.info(f"Processing account: {account_info['name']}")
+
+    # Start ping task
+    await start_ping(token, account_info)
+
+    # Perform daily claim if possible
+    if dailyclaim(token):
+        logger.info(f"<green>Daily claim successful for {account_info['name']}</green>")
+
+    # Add more tasks as needed (e.g., refreshing data, performing other API actions)
+    await asyncio.sleep(ping_interval)
 
 async def main():
-    print_header()
-    print_file_info()
+    tokens = load_file('tokens.txt')
+    proxies = load_file('proxies.txt')
 
-    tokens = load_file("tokens.txt")
-    proxies = ask_user_for_proxy()
+    # Ask user if they want to use proxy
+    use_proxy = ask_user_for_proxy()
 
+    # Assign proxies to tokens
     paired_tokens = assign_proxies_to_tokens(tokens, proxies)
+
     tasks = []
-
     for token, proxy in paired_tokens:
-        logger.info(f"Starting task for token: {token[-10:]}")
-        task = asyncio.create_task(start_ping(token, account_info))
-        tasks.append(task)
+        tasks.append(process_account(token, use_proxy, proxies))
 
+    # Run all tasks concurrently
     await asyncio.gather(*tasks)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
+    print_header()
+    print_file_info()
     asyncio.run(main())
