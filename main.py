@@ -51,7 +51,7 @@ logger.add(
 logger = logger.opt(colors=True)
 
 def print_header():
-    ascii_art = figlet_format("NODEPAY V2", font="slant")
+    ascii_art = figlet_format("NodepayBot", font="slant")
     colored_art = colored(ascii_art, color="cyan")
     border = "=" * 40
 
