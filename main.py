@@ -22,7 +22,7 @@ PING_INTERVAL = 60
 RETRIES = 60
 
 DOMAIN_API = {
-        "SESSION": "http://api.nodepay.ai/api/auth/session",
+    "SESSION": "http://api.nodepay.ai/api/auth/session",
     "PING": ["https://nw.nodepay.org/api/network/ping"],
     "DAILY_CLAIM": "https://api.nodepay.org/api/mission/complete-mission",
     "DEVICE_NETWORK": "https://api.nodepay.org/api/network/device-networks"
@@ -51,13 +51,13 @@ logger.add(
 logger = logger.opt(colors=True)
 
 def print_header():
-    ascii_art = figlet_format("NodepayBot", font="slant")
+    ascii_art = figlet_format("NODEPAY V2", font="slant")
     colored_art = colored(ascii_art, color="cyan")
     border = "=" * 40
 
     print(border)
     print(colored_art)
-    print(colored("by dark life", color="cyan", attrs=["bold"]))
+    print(colored("by DARK LIFE 🧬", color="cyan", attrs=["bold"]))
     print("\nWelcome to NodepayBot - Automate your tasks effortlessly!")
 
 def print_file_info():
