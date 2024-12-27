@@ -1,4 +1,4 @@
-import os
+ import os
 import re
 import sys
 from loguru import logger
@@ -11,9 +11,9 @@ DEBUG = True
 # Initialize colorama
 init(autoreset=True)
 
-# Gradient text generator
-def gradient_text(text):
-    colors = [91, 93, 92, 96, 94, 95]  # ANSI color codes for gradient
+# Dark pink and dark blue gradient text generator
+def dark_pink_blue_gradient(text):
+    colors = [95, 94]  # ANSI color codes for dark pink (95) and dark blue (94)
     gradient_text = ""
     for index, char in enumerate(text):
         if char.strip():  # Ignore spaces
@@ -25,13 +25,17 @@ def gradient_text(text):
 # Banner function
 def banner(total_tokens, total_proxies):
     raw_banner = f"""
-    _   __          __  Version 2.0 by dark life
-   / | / /___  ____/ /__  ____  ____ ___  __
-  /  |/ / __ \\/ __  / _ \\/ __ \\/ __ `/ / / /
- / /|  / /_/ / /_/ /  __/ /_/ / /_/ / /_/ / 
-/_/ |_/\\____/\\__,_/\\___/ .___/\\__,_/\\__, /  
-                      /_/          /____/   
-
+ -================= ≫ ──── ≪•◦ ❈ ◦•≫ ──── ≪=================-
+ │                                                          │
+ │  ██████╗  █████╗ ██████╗ ██╗  ██╗                        │
+ │  ██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝                        │
+ │  ██║  ██║███████║██████╔╝█████╔╝                         │
+ │  ██║  ██║██╔══██║██╔══██╗██╔═██╗                         │
+ │  ██████╔╝██║  ██║██║  ██║██║  ██╗                        │
+ │  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝                        │
+ │                                                          │
+ │                                                          │
+ ╰─━━━━━━━━━━━━━━━━━━━━━━━━Termux-os━━━━━━━━━━━━━━━━━━━━━━━─╯
 Welcome to NodepayBot - Automate your tasks effortlessly!
 Max 3 connections per account. Too many proxies may cause issues.
 
@@ -39,7 +43,7 @@ Max 3 connections per account. Too many proxies may cause issues.
 Total Tokens: {total_tokens}     |     Total Proxies: {total_proxies}
 ------------------------------------------------------------
 """
-    return gradient_text(raw_banner)
+    return dark_pink_blue_gradient(raw_banner)
 
 # Counts lines in a file
 def count_lines(file_path):
@@ -50,6 +54,11 @@ def count_lines(file_path):
         return 0
     except Exception:
         return 0
+
+# Wraps messages to fit within the allowed width
+def wrap_message(record):
+    if record["message"].startswith(Fore.CYAN) and "-" in record["message"]:
+        return True
     
     message_without_color = re.sub(r'\033\[.*?m', '', record["message"])
     wrapped_message = fill(message_without_color, width=120)
