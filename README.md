@@ -30,10 +30,10 @@
 ## Installation
 **1. Clone the repository:**
    ```bash
-   git clone https://github.com/Enukio/NodepayBot.git
+   git clone https://github.com/Mittyadav/NodepayBot1.git
    ```
    ```bash
-   cd NodepayBot
+   cd NodepayBot1
    ```
 **2. Install dependencies:**
    ```bash
@@ -128,7 +128,7 @@ Set the following environment variables in a `.env` file:
 ---
 
 ## Need Proxy?
-1. Sign up at [Proxies.fo](https://app.proxies.fo/ref/d02516e7-56b3-9a1f-b7ca-1fb08669f7a6).
+1. Sign up at [Proxies.fo](https://app.proxies.fo/ref/30b56a40-bacf-9c8a-9681-f9ba7628c585).
 2. Go to [Plans](https://app.proxies.fo/plans) and only purchase the "ISP plan" (Residential plans don’t work).
 3. Top up your balance, or you can directly buy a plan and pay with Crypto!
 4. Go to the Dashboard, select your ISP plan, and click "Generate Proxy."
