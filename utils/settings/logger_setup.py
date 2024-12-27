@@ -1,23 +1,35 @@
+import os
 import re
 import sys
-
 from loguru import logger
 from textwrap import fill
 from colorama import Fore, Style, init
 
-from utils.settings.config import DEBUG
-
+# Simulated DEBUG flag for logging
+DEBUG = True
 
 # Initialize colorama
 init(autoreset=True)
 
-# ASCII art for program startup
-start_text = """
+# Gradient text generator
+def gradient_text(text):
+    colors = [91, 93, 92, 96, 94, 95]  # ANSI color codes for gradient
+    gradient_text = ""
+    for index, char in enumerate(text):
+        if char.strip():  # Ignore spaces
+            gradient_text += f"\033[{colors[index % len(colors)]}m{char}\033[0m"
+        else:
+            gradient_text += char
+    return gradient_text
+
+# Banner function
+def banner(total_tokens, total_proxies):
+    raw_banner = f"""
     _   __          __  Version 2.0 by dark life
    / | / /___  ____/ /__  ____  ____ ___  __
-  /  |/ / __ \/ __  / _ \/ __ \/ __ `/ / / /
+  /  |/ / __ \\/ __  / _ \\/ __ \\/ __ `/ / / /
  / /|  / /_/ / /_/ /  __/ /_/ / /_/ / /_/ / 
-/_/ |_/\____/\__,_/\___/ .___/\__,_/\__, /  
+/_/ |_/\\____/\\__,_/\\___/ .___/\\__,_/\\__, /  
                       /_/          /____/   
 
 Welcome to NodepayBot - Automate your tasks effortlessly!
@@ -27,19 +39,17 @@ Max 3 connections per account. Too many proxies may cause issues.
 Total Tokens: {total_tokens}     |     Total Proxies: {total_proxies}
 ------------------------------------------------------------
 """
+    return gradient_text(raw_banner)
 
-# Reads file and counts lines
+# Counts lines in a file
 def count_lines(file_path):
     try:
-        with open(file_path, 'r') as file:
-            return sum(1 for line in file if line.strip())
-    except FileNotFoundError:
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                return sum(1 for line in file if line.strip())
         return 0
-
-# Wraps messages to fit within the allowed width
-def wrap_message(record):
-    if record["message"].startswith(Fore.CYAN) and "-" in record["message"]:
-        return True
+    except Exception:
+        return 0
     
     message_without_color = re.sub(r'\033\[.*?m', '', record["message"])
     wrapped_message = fill(message_without_color, width=120)
