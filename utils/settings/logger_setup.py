@@ -1,30 +1,18 @@
- import os
 import re
 import sys
+
 from loguru import logger
 from textwrap import fill
 from colorama import Fore, Style, init
 
-# Simulated DEBUG flag for logging
-DEBUG = True
+from utils.settings.config import DEBUG
+
 
 # Initialize colorama
 init(autoreset=True)
 
-# Dark pink and dark blue gradient text generator
-def dark_pink_blue_gradient(text):
-    colors = [95, 94]  # ANSI color codes for dark pink (95) and dark blue (94)
-    gradient_text = ""
-    for index, char in enumerate(text):
-        if char.strip():  # Ignore spaces
-            gradient_text += f"\033[{colors[index % len(colors)]}m{char}\033[0m"
-        else:
-            gradient_text += char
-    return gradient_text
-
-# Banner function
-def banner(total_tokens, total_proxies):
-    raw_banner = f"""
+# ASCII art for program startup
+start_text = """
  -================= ≫ ──── ≪•◦ ❈ ◦•≫ ──── ≪=================-
  │                                                          │
  │  ██████╗  █████╗ ██████╗ ██╗  ██╗                        │
@@ -36,23 +24,23 @@ def banner(total_tokens, total_proxies):
  │                                                          │
  │                                                          │
  ╰─━━━━━━━━━━━━━━━━━━━━━━━━Termux-os━━━━━━━━━━━━━━━━━━━━━━━─╯
+
 Welcome to NodepayBot - Automate your tasks effortlessly!
 Max 3 connections per account. Too many proxies may cause issues.
 
-------------------------------------------------------------
-Total Tokens: {total_tokens}     |     Total Proxies: {total_proxies}
-------------------------------------------------------------
-"""
-    return dark_pink_blue_gradient(raw_banner)
+━━━━━━━━━━━━━━━━━━━━━━━━SCRIPT-HUB━━━━━━━━━━━━━━━━━━━━━━━
 
-# Counts lines in a file
+Total Tokens: {total_tokens}     |     Total Proxies: {total_proxies}
+━━━━━━━━━━━━━━━━━━━━━━━━DARK-LIFE━━━━━━━━━━━━━━━━━━━━━━━
+
+"""
+
+# Reads file and counts lines
 def count_lines(file_path):
     try:
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:
-                return sum(1 for line in file if line.strip())
-        return 0
-    except Exception:
+        with open(file_path, 'r') as file:
+            return sum(1 for line in file if line.strip())
+    except FileNotFoundError:
         return 0
 
 # Wraps messages to fit within the allowed width
